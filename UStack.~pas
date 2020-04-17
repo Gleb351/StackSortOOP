@@ -1,0 +1,86 @@
+unit UStack;
+interface
+
+uses
+    SysUtils;
+  const
+    N=100;
+  type
+    TElem=Pointer;
+    TMas=array[0..N-1] of TElem;
+
+  TStack = class
+    private
+      FHead:integer;
+      FMas:TMas;
+    protected
+      function ElemToStr(el : Pointer) : string; virtual; abstract;
+    public
+      constructor Create;
+      function isEmpty:boolean;
+      function TryPush(el:TElem):boolean;
+      function TryPop(var el:TElem):boolean;  
+      function PrintAndClear : string;
+      destructor Destroy; override;
+
+      class function TryStrToElem(word : string; var p : pointer) : boolean; virtual; abstract;
+      class function CheckElem(el : pointer) : boolean; virtual; abstract;
+  end;
+
+implementation
+
+constructor TStack.Create;
+begin
+  FHead:=0;
+end;
+
+function TStack.isEmpty: boolean;
+begin
+  Result := FHead = 0;
+end;
+
+function TStack.TryPop(var el: TElem): boolean;
+begin
+  Result:=FHead<>0;
+  if Result then
+    begin
+      el:=FMas[FHead];
+      dec(FHead);
+    end;
+end;
+
+function TStack.TryPush(el: TElem): boolean;
+begin
+  Result:=FHead<N;
+  if Result then
+    begin
+      FMas[FHead] := el;
+      inc(FHead);
+    end;
+end;
+      
+function TStack.PrintAndClear : string;
+var
+  el : TElem;
+begin
+  Result := '';
+  while TryPop(el) do
+    begin
+      Result := Result + ElemToStr(el);
+      Result := Result + ' ';
+    end;
+end;
+
+destructor TStack.Destroy;
+var el: TElem;
+begin
+  while not IsEmpty do
+    TryPop(el);
+  inherited Destroy;
+end;
+
+
+
+
+end.
+ 
